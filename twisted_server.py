@@ -3,55 +3,26 @@
 #This implementation does not work with motive (yet)
 #It just sends data over and over from a local file
 
-import optparse, os, sys, socket, csv
-
-from struct import *
-
-from twisted.internet import reactor, defer, task
-from twisted.internet.protocol import Protocol, Factory
+from twisted.internet import defer, task
+from twisted.python import log, usage
+from twisted.internet.protocol import Protocol, ClientFactory, Factory
 from twisted.protocols.basic import LineOnlyReceiver
+from struct import *
+import sys, pdb
 
-defaultTwistedServerPort = 8123
-defaultMotivePort = 27015
-# hostName = 'YuchiLi-PC'
-hostName = 'jeffrey-K501UX'
-
-msgLimit = 7
 
 # win32 support
 if sys.platform == 'win32':
     from twisted.internet import win32eventreactor
     win32eventreactor.install()
 
-# def parse_args():
-#     usage = """usage: %prog [options] file
-#
-# This is the Twisted Server
-# Run it like this:
-#
-#   python twisted_server2-0.py <path-to-poetry-file>
-# """
-#
-#     parser = optparse.OptionParser(usage)
-#
-#     help = "The port to listen on. Default to a random available port."
-#     parser.add_option('--port', type='int', help=help)
-#
-#     help = "The interface to listen on. Default is localhost."
-#     parser.add_option('--iface', help=help, default='localhost')
-#
-#     options, args = parser.parse_args()
-#
-#     if len(args) != 1:
-#         parser.error('Provide exactly one CSV file.')
-#
-#     file = args[0]
-#
-#     if not os.path.exists(args[0]):
-#         parser.error('No such file: %s' % file)
-#
-#     return options, file
+# defaultTwistedServerPort = 5009
+defaultTwistedServerPort = 53335
+defaultMotivePort = 27015
+hostName = 'YuchiLi-PC'
+# hostName = 'jeffrey-K501UX'
 
+msgLimit = 7
 
 class MotiveProtocol(LineOnlyReceiver):
 
@@ -69,7 +40,10 @@ class MotiveProtocol(LineOnlyReceiver):
         #TODO: call factory method to do ... wait?
 
     def lineReceived(self, data):
+        # data = unicode(data, errors='ignore')
+        
         try:
+            # print (data)
             self.dataBuffer.append(unpack("f", data))
             self.count += 1
         except:
@@ -84,20 +58,27 @@ class MotiveProtocol(LineOnlyReceiver):
 
         if(self.count==msgLimit):
             #TODO: fire deferred callbacks in output protocol factory
-            self.factory.outputFactory.sendToAll(self.DataBuffer)
+            self.factory.outputFactory.sendToAll(self.dataBuffer)
             self.dataBuffer = []
             self.count = 0
 
 
-class MotiveProtocolFactory(Factory):
+class MotiveProtocolFactory(ClientFactory):
 
     protocol = MotiveProtocol
 
     def __init__(self, outputFactory):  # store reference to output factory
         self.outputFactory = outputFactory
 
+    def startedConnecting(self, connector):
+        print ("Started to connect.\n")
+
+    def clientConnectionLost(self):
+        print ("Lost connection to Motive. Standby...")
+
     def disconnectedState(self):
         print ("Shutting down Twisted reactor\n")
+        reactor.stop()
 
 
 class ClientHandler(LineOnlyReceiver):
@@ -125,7 +106,7 @@ class ClientHandler(LineOnlyReceiver):
 class ClientHandlerFactory(Factory):
     protocol = ClientHandler
 
-    def __init__(self, payload):
+    def __init__(self):
         self.clients = {}
         self.index = 0
 
@@ -154,18 +135,20 @@ if __name__ == '__main__':
     # text = open(file).read()
     # payload = open(file)
 
-    clientConnectionFactory = ClientHandlerFactory()
-    motiveFactory = MotiveProtocolFactory(clientConnectionFactory)
+    from twisted.internet import reactor
 
-    piPort = reactor.listenTCP(defaultTwistedServerPort, clientConnectionFactory, interface=socket.gethostbyname(hostName))
-    motivePort = reactor.listenTCP(defaultMotivePort, motiveFactory, interface="127.0.0.1")
+    clientConnectionFactory = ClientHandlerFactory()
+    # motiveFactory = MotiveProtocolFactory(clientConnectionFactory)
+
+    # piPort = reactor.listenTCP(defaultTwistedServerPort, clientConnectionFactory, interface=socket.gethostbyname(hostName))
+    # piPort = reactor.listenTCP(defaultTwistedServerPort, clientConnectionFactory, interface="128.252.19.161")
+    piPort = reactor.listenTCP(defaultTwistedServerPort, clientConnectionFactory, interface="192.168.95.109")
+    motivePort = reactor.connectTCP("localhost", defaultMotivePort, MotiveProtocolFactory(clientConnectionFactory))
 
     # syntax: sendToAll() passes result of the call to LoopingCall
     # instead, you should omit the () to pass sendToAll as an argument
     # l = task.LoopingCall(clientConnectionFactory.sendToAll)
     # l.start(0.1)    # data send rate
-
-    # print 'Serving %s on %s.' % (file, piPort.getHost())
 
     print 'Serving Motive messages from %s to clients at %s' % (motivePort, piPort)
 
