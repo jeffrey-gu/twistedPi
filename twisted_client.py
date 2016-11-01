@@ -72,6 +72,9 @@ class SocketClientFactory(ClientFactory):
         print ("connection failed")
         reactor.stop()
 
+    def clientConnectionLost(self, connector, reason):
+        print ("connection lost due to: %s"), reason
+
     def clientReady(self, client):
         self.client = client
         # self.connect_success_callback()
@@ -81,9 +84,9 @@ class SocketClientFactory(ClientFactory):
         print (msg)
 
     #TODO: NOT CALLED --> do we want clients to send messages to server?
-    def send_msg(self, msg):
-        if self.client:
-            self.client.sendLine(msg)
+    # def send_msg(self, msg):
+    #     if self.client:
+    #         self.client.sendLine(msg)
 
 ###########################################
 
@@ -98,4 +101,5 @@ if __name__ == '__main__':
         reactor.connectTCP(host, defaultTwistedServerPort, SocketClientFactory())
         # reactor.connectTCP("bach.ese.wustl.edu", defaultTwistedServerPort, SocketClientFactory())
         reactor.run()
-    print ("could not find host")
+    else:
+        print ("could not find host")
