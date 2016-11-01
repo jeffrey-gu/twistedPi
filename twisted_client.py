@@ -17,7 +17,6 @@ hostName = 'bach.ese.wustl.edu'
 # hostName = 'jeffrey-K501UX'
 
 host = None
-# defaultTwistedServerPort = 5009
 defaultTwistedServerPort = 53335
 defaultUserPort = 5000
 
@@ -95,8 +94,8 @@ if __name__ == '__main__':
     # host = "128.252.19.161"
     # host = "bach.ese.wustl.edu"
     if(host is not None):
-        print ('host is %s') %(host)
-        # reactor.connectTCP(host, defaultTwistedServerPort, SocketClientFactory())
-        reactor.connectTCP("bach.ese.wustl.edu", defaultTwistedServerPort, SocketClientFactory())
+        print ('Attempting connection to %s:%s') %(host, defaultTwistedServerPort)
+        reactor.connectTCP(host, defaultTwistedServerPort, SocketClientFactory())
+        # reactor.connectTCP("bach.ese.wustl.edu", defaultTwistedServerPort, SocketClientFactory())
         reactor.run()
     print ("could not find host")
