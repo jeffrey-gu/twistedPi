@@ -93,6 +93,7 @@ class SocketClientFactory(ClientFactory):
 if __name__ == '__main__':
     print('starting program')
     host = findHost()
+    # host = 128.
     # host = "192.168.95.219"
     # host = "128.252.19.161"
     # host = "bach.ese.wustl.edu"
