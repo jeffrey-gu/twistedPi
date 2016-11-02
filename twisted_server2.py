@@ -137,7 +137,7 @@ class InputProtocol(basic.LineOnlyReceiver):
             except:
                 # super(InputProtocol,self).writeLog("Error reading data stream")
                 print ("Error reading data stream")
-        if(self.count==7):
+        if(self.count==3):
             #super(InputProtocol,self).writeLog(self.dataBuff)
             # print (self.dataBuff)
             # print ("sending to all")
