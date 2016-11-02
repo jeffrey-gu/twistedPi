@@ -1,0 +1,33 @@
+﻿Build started 11/1/2016 1:59:21 PM.
+     1>Project "C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\SampleClient.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\MotiveClient.lastbuildstate".
+       InitializeBuildStatus:
+         Creating "Debug\MotiveClient.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\include\ /Zi /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _VC80_UPGRADE=0x0710 /D _MBCS /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt MotiveClient.cpp
+         MotiveClient.cpp
+     1>MotiveClient.cpp(611): warning C4101: 'recvbuf' : unreferenced local variable
+     1>MotiveClient.cpp(610): warning C4101: 'iSendResult' : unreferenced local variable
+     1>MotiveClient.cpp(680): warning C4101: 'iResult' : unreferenced local variable
+     1>MotiveClient.cpp(693): warning C4101: 'iResult' : unreferenced local variable
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\MotiveClient.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:..\..\lib NatNetLibStatic.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\MotiveClient.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\MotiveClient.pdb" /ASSEMBLYDEBUG /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\MotiveClient.lib" /MACHINE:X86 Debug\MotiveClient.obj 
+          
+     1>LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+     1>NatNetLibStatic.lib(ClientCore.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(ClientCore.obj)' or at 'C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(NatNetClient.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(NatNetClient.obj)' or at 'C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(NatNetHelper.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(NatNetHelper.obj)' or at 'C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(quattoeuler.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(quattoeuler.obj)' or at 'C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\vc100.pdb'; linking object as if no debug info
+     1>NatNetLibStatic.lib(UnicastClientCore.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'NatNetLibStatic.lib(UnicastClientCore.obj)' or at 'C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\vc100.pdb'; linking object as if no debug info
+         SampleClient.vcxproj -> C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\MotiveClient.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\bin\MotiveClient.exe;#1" /manifest Debug\MotiveClient.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Debug\MotiveClient.unsuccessfulbuild".
+         Touching "Debug\MotiveClient.lastbuildstate".
+     1>Done Building Project "C:\Users\Lab\Documents\ese499PiCar\NatNetSDK_2.8\Samples\SampleClient - Copy\SampleClient.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.65
