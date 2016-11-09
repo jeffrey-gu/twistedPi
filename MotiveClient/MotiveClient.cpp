@@ -1,6 +1,6 @@
 //=============================================================================
-// Copyright © 2014 NaturalPoint, Inc. All Rights Reserved.
-// 
+// Copyright ï¿½ 2014 NaturalPoint, Inc. All Rights Reserved.
+//
 // This software is provided by the copyright holders and contributors "as is" and
 // any express or implied warranties, including, but not limited to, the implied
 // warranties of merchantability and fitness for a particular purpose are disclaimed.
@@ -92,7 +92,7 @@ char szServerIPAddress[128] = "";
 int _tmain(int argc, _TCHAR* argv[])
 {
     int iResult;
-    
+
 	SetupExportServer();
 	//SetupSerialSocket();
 
@@ -194,10 +194,10 @@ int _tmain(int argc, _TCHAR* argv[])
                 printf("Unknown data type.");
                 // Unknown
             }
-        }      
+        }
 	}
 
-	
+
 	// Create data file for writing received stream into
 	char szFile[MAX_PATH];
 	char szFolder[MAX_PATH];
@@ -224,11 +224,11 @@ int _tmain(int argc, _TCHAR* argv[])
 		switch(c)
 		{
 			case 'q':
-				bExit = true;		
-				break;	
+				bExit = true;
+				break;
 			case 'r':
 				resetClient();
-				break;	
+				break;
             case 'p':
                 sServerDescription ServerDescription;
                 memset(&ServerDescription, 0, sizeof(ServerDescription));
@@ -238,13 +238,13 @@ int _tmain(int argc, _TCHAR* argv[])
                     printf("Unable to connect to server. Host not present. Exiting.");
                     return 1;
                 }
-                break;	
+                break;
             case 'f':
                 {
                     sFrameOfMocapData* pData = theClient->GetLastFrameOfData();
                     printf("Most Recent Frame: %d", pData->iFrame);
                 }
-                break;	
+                break;
             case 'm':	                        // change to multicast
                 iConnectionType = ConnectionType_Multicast;
                 iResult = CreateClient(iConnectionType);
@@ -355,13 +355,13 @@ void __cdecl DataHandler(sFrameOfMocapData* data, void* pUserData)
 
 	if(fp)
 		_WriteFrame(fp,data);
-	
+
     int i=0;
 
     printf("FrameID : %d\n", data->iFrame);
     printf("Timestamp :  %3.2lf\n", data->fTimestamp);
     printf("Latency :  %3.2lf\n", data->fLatency);
-    
+
     // FrameOfMocapData params
     bool bIsRecording = ((data->params & 0x01)!=0);
     bool bTrackedModelsChanged = ((data->params & 0x02)!=0);
@@ -369,8 +369,8 @@ void __cdecl DataHandler(sFrameOfMocapData* data, void* pUserData)
         printf("RECORDING\n");
     if(bTrackedModelsChanged)
         printf("Models Changed.\n");
-	
-        
+
+
     // timecode - for systems with an eSync and SMPTE timecode generator - decode to values
 	int hour, minute, second, frame, subframe;
 	bool bValid = pClient->DecodeTimecode(data->Timecode, data->TimecodeSubframe, &hour, &minute, &second, &frame, &subframe);
@@ -486,7 +486,7 @@ void _WriteHeader(FILE* fp, sDataDescriptions* pBodyDefs)
 
     if(!pBodyDefs->arrDataDescriptions[0].type == Descriptor_MarkerSet)
         return;
-        
+
 	sMarkerSetDescription* pMS = pBodyDefs->arrDataDescriptions[0].Data.MarkerSetDescription;
 
 	fprintf(fp, "<MarkerSet>\n\n");
@@ -511,7 +511,7 @@ void _WriteHeader(FILE* fp, sDataDescriptions* pBodyDefs)
 
 void _WriteFrame(FILE* fp, sFrameOfMocapData* data)
 {
-	printf("_WriteFrame is called\n");
+	// printf("_WriteFrame is called\n");
 	//fprintf(fp, "%d", data->iFrame);
 	/*for(int i =0; i < data->MocapData->nMarkers; i++)
 	{
@@ -522,16 +522,24 @@ void _WriteFrame(FILE* fp, sFrameOfMocapData* data)
 	memset( recvbuf, '\0', sizeof(recvbuf) );
     int recvbuflen = DEFAULT_BUFLEN;
 	fprintf(fp, "frame number %d\n", data->iFrame);
-	
+
 	/*for(int i =0; i < data->MocapData->nMarkers; i++)
 	{
 		fprintf(fp, "\t%.5f\t%.5f\t%.5f", data->MocapData->Markers[i][0], data->MocapData->Markers[i][1], data->MocapData->Markers[i][2]);
 	}*/
-	printf("About to enter for loop with %d\n", data->nRigidBodies);
+	// printf("About to enter for loop with %d\n", data->nRigidBodies);
+
+  //////////////////////////////////////////////////////////
+  //send frameID
+  memcpy(temp, data->iFrame, sizeof(int));
+  SendDataExportServer(temp,sizeof(int));
+  SendDataExportServer("\n",1);
+
+  ///////////////////////////////////////////////////////////
 
 	for(int j=0; j< data->nRigidBodies; j++)
 	{
-		printf("received data: writing to export server\n");
+		// printf("received data: writing to export server\n");
 
 		sRigidBodyData rbData = data->RigidBodies[j];
 		fprintf(fp,"rigidBody number %d id %d \t%3.2f\t%3.2f\t%3.2f\t%3.2f\t%3.2f\t%3.2f\t%3.2f\n",
@@ -540,6 +548,17 @@ void _WriteFrame(FILE* fp, sFrameOfMocapData* data)
 			j, rbData.ID, rbData.x, rbData.y, rbData.z, rbData.qx, rbData.qy, rbData.qz, rbData.qw );
 		//SendDataExportServer(recvbuf);
 		char temp[sizeof(float)];
+
+    //////////////////////////////////////////////////////////
+    //also send rigid body ID and timestamp
+    memcpy(temp, &rbData.ID, sizeof(float));
+    SendDataExportServer(temp,sizeof(float));
+		SendDataExportServer("\n",1);
+
+    memcpy(temp, data->fTimestamp, sizeof(float));  //currently sending as a float
+    SendDataExportServer(temp,sizeof(float));
+		SendDataExportServer("\n",1);
+    //////////////////////////////////////////////////////////
 
 		memcpy(temp,&rbData.x,sizeof(float));
 		SendDataExportServer(temp,sizeof(float));
@@ -610,7 +629,7 @@ int SetupExportServer()
     int iSendResult;
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
-    
+
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     if (iResult != 0) {
@@ -623,7 +642,7 @@ int SetupExportServer()
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
-	
+
 
     // Resolve the server address and port
     iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
@@ -641,7 +660,7 @@ int SetupExportServer()
         WSACleanup();
         return 1;
     }
-	
+
     // Setup the TCP listening socket
     iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
@@ -678,7 +697,7 @@ int SetupExportServer()
 
 int SendDataExportServer(char recvbuf[DEFAULT_BUFLEN]){
 	int iResult,iSendResult;
-    
+
     iSendResult = send( ClientSocket, recvbuf, 512, 0 );
     if (iSendResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
@@ -691,7 +710,7 @@ int SendDataExportServer(char recvbuf[DEFAULT_BUFLEN]){
 
 int SendDataExportServer(char recvbuf[DEFAULT_BUFLEN], int dLength){
 	int iResult,iSendResult;
-    
+
     iSendResult = send( ClientSocket, recvbuf, dLength, 0 );
     if (iSendResult == SOCKET_ERROR) {
         printf("send failed with error: %d\n", WSAGetLastError());
@@ -732,7 +751,7 @@ int CloseExportServer(){
 //
 //	// Issue write.
 //	if (!WriteFile(hComm, recvbuf, dLength, &dwWritten, &osWrite)) {
-//		if (GetLastError() != ERROR_IO_PENDING) { 
+//		if (GetLastError() != ERROR_IO_PENDING) {
 //			// WriteFile failed, but it isn't delayed. Report error and abort.
 //			fRes = FALSE;
 //		}
@@ -756,10 +775,10 @@ int CloseExportServer(){
 //int SetupSerialSocket(){
 //	DCB config = {0};
 //
-//	hComm = CreateFile("COM3",  
-//                    GENERIC_READ | GENERIC_WRITE, 
-//                    0, 
-//                    NULL, 
+//	hComm = CreateFile("COM3",
+//                    GENERIC_READ | GENERIC_WRITE,
+//                    0,
+//                    NULL,
 //                    OPEN_EXISTING,
 //                    FILE_FLAG_OVERLAPPED,
 //                    NULL);
@@ -772,7 +791,7 @@ int CloseExportServer(){
 //        printf("Get configuration port has a problem.");
 //        return 1;
 //    }
-//	
+//
 //	config.DCBlength = sizeof(config);
 //
 //	config.BaudRate = 115200;
