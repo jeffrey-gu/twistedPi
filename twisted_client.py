@@ -1,7 +1,5 @@
 """
-This version does not have a user program interfacing component...the rationale is that
-you can simply import the file into your user program...though how a car program would run
-in conjunction with a reactor loop is unclear
+Original version. No stdio interfacing component. Prints results direct to console.
 
 """
 
@@ -20,7 +18,8 @@ host = None
 defaultTwistedServerPort = 53335
 defaultUserPort = 5000
 
-options = ['a', 'm', 'o', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+# deprecated
+# options = ['a', 'm', 'o', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
 # use win32 reactor if applicable
 if sys.platform == 'win32':

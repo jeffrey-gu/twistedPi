@@ -1,5 +1,5 @@
 """
-This is identical to twisted_client.py, except that it writes all received positional data to a file
+Identical to first version except that it writes results to file
 
 """
 
@@ -10,15 +10,11 @@ import sys, socket, struct
 
 from twisted.internet import reactor
 
-# hostName = 'YuchiLi-PC'
 hostName = 'bach.ese.wustl.edu'
-# hostName = 'jeffrey-K501UX'
 
 host = None
 defaultTwistedServerPort = 53335
 defaultUserPort = 5000
-
-options = ['a', 'm', 'o', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
 # use win32 reactor if applicable
 if sys.platform == 'win32':
@@ -27,11 +23,10 @@ if sys.platform == 'win32':
 
 # find hostname
 def findHost():
-    # TODO: error case for host not found
     addr = socket.gethostbyname(hostName)
     return addr
 
-######################################################3
+############################################
 
 class SocketClientProtocol(LineOnlyReceiver):
 
@@ -51,22 +46,11 @@ class SocketClientFactory(ClientFactory):
     """
     protocol = SocketClientProtocol
 
-    # def __init__(
-    #         self,
-    #         connect_success_callback,
-    #         connect_fail_callback,
-    #         recv_callback):
-
     def __init__(self):
-        # self.connect_success_callback = connect_success_callback
-        # self.connect_fail_callback = connect_fail_callback
-        # self.recv_callback = recv_callback
-
         # store reference to client
         self.client = None
 
     def clientConnectionFailed(self, connector, reason):
-        # self.connect_fail_callback(reason)
         print ("connection failed")
         reactor.stop()
 
@@ -76,10 +60,8 @@ class SocketClientFactory(ClientFactory):
 
     def clientReady(self, client):
         self.client = client
-        # self.connect_success_callback()
 
     def got_msg(self, msg):
-        # self.recv_callback()
         print (msg)
         outputFile.write(msg)
         outputFile.write('\n')
@@ -95,14 +77,10 @@ if __name__ == '__main__':
     print('starting program')
     host = findHost()
     outputFile = open('motive_results.txt', 'w+')
-    # host = 128.
-    # host = "192.168.95.219"
-    # host = "128.252.19.161"
-    # host = "bach.ese.wustl.edu"
+
     if(host is not None):
         print ('Attempting connection to %s:%s') %(host, defaultTwistedServerPort)
         reactor.connectTCP(host, defaultTwistedServerPort, SocketClientFactory())
-        # reactor.connectTCP("bach.ese.wustl.edu", defaultTwistedServerPort, SocketClientFactory())
         reactor.run()
     else:
         print ("could not find host")
