@@ -40,7 +40,7 @@ class SocketClientProtocol(LineOnlyReceiver):
 
     # after int prefix and other framing are removed:
     def lineReceived(self, line):
-        print ("line received")
+        # print ("line received")
         self.factory.got_msg(line)
 
     def connectionMade(self):   # calls when connection is made with Twisted server
@@ -94,8 +94,7 @@ class SocketClientFactory(ClientFactory):
             accumTime += timeInterval
         
         outputFile.write(msg)
-        
-        outputFile.write('\tRunning Time: %f\n' %(accumTime))
+        outputFile.write('\tRunning Time: %f\tTime Interval: %f\n' %(accumTime, timeInterval))
 
         prevTime = currTime
 

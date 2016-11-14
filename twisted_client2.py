@@ -18,7 +18,7 @@ host = None
 defaultTwistedServerPort = 53335
 defaultUserPort = 5000
 
-options = ['a', 'm', 'o', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+# options = ['a', 'm', 'o', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
 # use win32 reactor if applicable
 if sys.platform == 'win32':
