@@ -1,5 +1,6 @@
 """
-Same as version 2, except with time interval benchmarks.
+This is identical to twisted_client.py, except that it writes all received positional data to a file
+
 """
 
 from twisted.internet.protocol import Protocol, Factory, ClientFactory
@@ -9,7 +10,9 @@ import sys, socket, struct, time
 
 from twisted.internet import reactor
 
+# hostName = 'YuchiLi-PC'
 hostName = 'bach.ese.wustl.edu'
+# hostName = 'jeffrey-K501UX'
 
 host = None
 defaultTwistedServerPort = 53335
@@ -18,6 +21,8 @@ defaultUserPort = 5000
 prevTime = 0.0
 accumTime = 0.0
 
+# options = ['a', 'm', 'o', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+
 # use win32 reactor if applicable
 if sys.platform == 'win32':
     from twisted.internet import win32eventreactor
@@ -25,6 +30,7 @@ if sys.platform == 'win32':
 
 # find hostname
 def findHost():
+    # TODO: error case for host not found
     addr = socket.gethostbyname(hostName)
     return addr
 
@@ -34,7 +40,7 @@ class SocketClientProtocol(LineOnlyReceiver):
 
     # after int prefix and other framing are removed:
     def lineReceived(self, line):
-        print ("line received")
+        # print ("line received")
         self.factory.got_msg(line)
 
     def connectionMade(self):   # calls when connection is made with Twisted server
@@ -48,11 +54,22 @@ class SocketClientFactory(ClientFactory):
     """
     protocol = SocketClientProtocol
 
+    # def __init__(
+    #         self,
+    #         connect_success_callback,
+    #         connect_fail_callback,
+    #         recv_callback):
+
     def __init__(self):
+        # self.connect_success_callback = connect_success_callback
+        # self.connect_fail_callback = connect_fail_callback
+        # self.recv_callback = recv_callback
+
         # store reference to client
         self.client = None
 
     def clientConnectionFailed(self, connector, reason):
+        # self.connect_fail_callback(reason)
         print ("connection failed")
         reactor.stop()
 
@@ -62,8 +79,10 @@ class SocketClientFactory(ClientFactory):
 
     def clientReady(self, client):
         self.client = client
+        # self.connect_success_callback()
 
     def got_msg(self, msg):
+        # self.recv_callback()
         # print (msg)
 
         global prevTime, accumTime
@@ -76,7 +95,7 @@ class SocketClientFactory(ClientFactory):
         
         outputFile.write(msg)
         
-        outputFile.write('\tRunning Time: %f\n' %(accumTime))
+        outputFile.write('\tTime Interval: %f\tRunning Time: %f\n' %(timeInterval, accumTime))
 
         prevTime = currTime
 
@@ -91,10 +110,14 @@ if __name__ == '__main__':
     print('starting program')
     host = findHost()
     outputFile = open('motive_results.txt', 'w+')
-
+    # host = 128.
+    # host = "192.168.95.219"
+    # host = "128.252.19.161"
+    # host = "bach.ese.wustl.edu"
     if(host is not None):
         print ('Attempting connection to %s:%s') %(host, defaultTwistedServerPort)
         reactor.connectTCP(host, defaultTwistedServerPort, SocketClientFactory())
+        # reactor.connectTCP("bach.ese.wustl.edu", defaultTwistedServerPort, SocketClientFactory())
         reactor.run()
     else:
         print ("could not find host")
