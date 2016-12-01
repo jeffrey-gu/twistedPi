@@ -44,6 +44,7 @@ class SocketClientProtocol(LineOnlyReceiver):
         self.factory.got_msg(line)
 
     def connectionMade(self):   # calls when connection is made with Twisted server
+        self.transport.setTcpNoDelay(True)
         print ("connected to twisted server")
         self.factory.clientReady(self)
 
