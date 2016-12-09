@@ -1,32 +1,29 @@
-# uses netstring receiver
+# uses netstring receiver as both the subclass for input and output
 
 # !/usr/bin/env python
 
 # Copyright (c) Twisted Matrix Laboratories.
 # See LICENSE for details.
 
-from twisted.python import log, usage
 from twisted.internet import defer, task
 from twisted.internet.protocol import Protocol, ClientFactory, ServerFactory, Factory
 from twisted.protocols import basic
-import sys, time, struct, bitarray
-import ipdb
+import sys, time, struct
 
 prevTime = 0.0
 streamError = []
 
 if sys.platform == 'win32':
     from twisted.internet import win32eventreactor
-
     win32eventreactor.install()
 
-
-class OutputProtocol(object, basic.LineOnlyReceiver):
+class OutputProtocol(object, basic.NetstringReceiver):
     def __init__(self):
-        self.delimiter = '\n'
+        self.MAX_LENGTH = 33    # seven 4-byte values
         self.count = 0
 
     def connectionMade(self):
+        self.transport.setTcpNoDelay(True)
         print ("Got a RPi connection!")
         self.transport.write("hello :-)!\r\n")
         self.factory.client_list.append(self)
@@ -36,22 +33,7 @@ class OutputProtocol(object, basic.LineOnlyReceiver):
         self.factory.client_list.remove(self)
 
     def sendMsg(self, data):
-        '''#header 0x7E is new packet
-        header = '\x7E'
-        self.transport.write('header')
-        #0x01 is sensor data
-        packetType='\x01'
-        self.transport.write(packetType)
-        #seven values at 4 bytes each = 28 bytes in total
-        packetLength = 28
-        self.transport.write(packetLength)
-        #for some reason, data is a list of tuples so we need to break it up into a string
-        '''
-        # for el in data:
-        #     self.transport.write(pack('f',el[0])+"\n")
-
-        # self.transport.write("\r\n")
-        self.transport.write(str(data) + "\r\n")
+        self.sendString(data)
 
 
 class OutputProtocolFactory(ServerFactory):
@@ -79,29 +61,30 @@ class InputProtocol(basic.NetstringReceiver):
         print ("Connected to Motive")
 
     def stringReceived(self, string):
-        global prevTime
+        # global prevTime
+        # currTime = time.clock()
 
-        currTime = time.clock()
         bytesReceived = sys.getsizeof(string)
         print 'Size of data: %d\n' % (bytesReceived)  # prints out 66 bytes... padding?
 
         # convert to binary format - this gets condensed down to 33 bytes
-        binData = ' '.join('{0:08b}'.format(ord(x), 'b') for x in string)
-        outputFile_bin.write(binData)
-        outputFile_bin.write('\tReceived %d bytes\tBefore: %f\tNow: %f\n\n' % (bytesReceived, prevTime, currTime))
+        # binData = ' '.join('{0:08b}'.format(ord(x), 'b') for x in string)
+        # outputFile_bin.write(binData)
+        # outputFile_bin.write('\tReceived %d bytes\tBefore: %f\tNow: %f\n\n' % (bytesReceived, prevTime, currTime))
 
-        try:
-            self.dataBuff.append(struct.unpack("!HBBBfffffff", string))
-            outputFile.write(str(self.dataBuff))
-        except:
-            print 'Failed to unpack\n'
+        # try:
+        #     self.dataBuff.append(struct.unpack("!HBBBfffffff", string))
+        #     outputFile.write(str(self.dataBuff))
+        # except:
+        #     print 'Failed to unpack\n'
 
-        outputFile.write('\tBefore: %f\tNow: %f\n\n' % (prevTime, currTime))
-        prevTime = currTime
+        # outputFile.write('\tBefore: %f\tNow: %f\n\n' % (prevTime, currTime))
+        # prevTime = currTime
+        #
+        # self.outputHandle.sendToAll(self.dataBuff)
+        # self.dataBuff = []
 
-        # ipdb.set_trace()
-        self.outputHandle.sendToAll(self.dataBuff)
-        self.dataBuff = []
+        self.outputHandle.sendToAll(string)
 
 
 class InputProtocolFactory(ClientFactory):
